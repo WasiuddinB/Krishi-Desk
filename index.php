@@ -137,23 +137,23 @@
       <section id="banner" class="my-5 py-5">
         <div class="container">
           <h4>Mid Season Sale</h4>
-          <h1>Autumn Collection <br> Up to 30% OFF</h1>
+          <h1>Vast Collection <br> Almost every products available</h1>
           <button class="text-uppercase">Shop Now</button>
         </div>
       </section>
 
-      <!--Clothes-->
+      <!--Vegetables-->
       <section id="featured" class="my-5">
         <div class="container text-center mt-5 py-5">
-          <h3>Dresses</h3>
+          <h3>Vegetables</h3>
           <hr class="mx-auto">
           <p>Here you can check the featured products.</p>
         </div>
         <div class="row mx-auto container-fluid">
 
-        <?php include('server/get_coats.php'); ?>
+        <?php include('server/get_veg.php'); ?>
 
-        <?php while($row=$coat_products->fetch_assoc()) { ?>
+        <?php while($row=$veg_products->fetch_assoc()) { ?>
           <div class="product text-center col-lg-3 col-md-4 col-sm-12">
             <img class="img-fluid mb-3" src="assets/imgs/<?php echo $row['product_image']; ?>"/>
             <div class="star">
@@ -173,10 +173,10 @@
         </div>
       </section>
 
-      <!--Shoes-->
+      <!--Machines-->
       <section id="shoes" class="my-5">
         <div class="container text-center mt-5 py-5">
-          <h3>Shoes</h3>
+          <h3>Machines</h3>
           <hr class="mx-auto">
           <p>Here you can check the featured products.</p>
         </div>
@@ -236,10 +236,10 @@
         </div>
       </section>
 
-      <!--Watches-->
+      <!--Pesticides-->
       <section id="watches" class="my-5">
         <div class="container text-center mt-5 py-5">
-          <h3>Watches</h3>
+          <h3>Pesticides</h3>
           <hr class="mx-auto">
           <p>Here you can check the featured products.</p>
         </div>
