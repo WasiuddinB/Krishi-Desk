@@ -18,7 +18,8 @@ if(isset($_POST['add_to_cart'])){
 
             $_SESSION['cart'][$product_id]=$product_array;
         }else{
-            echo '<script>alert()</script>';
+            echo '<script>alert("Product was already added");</script>';
+            
         }
 
     }else{
@@ -116,20 +117,22 @@ if(isset($_POST['add_to_cart'])){
                 <th>Quantity</th>
                 <th>Subtotal</th>
             </tr>
+
+            <?php foreach($_SESSION['cart'] as $key=>$value){?>
             <tr>
                 <td>
                     <div class="product-info">
-                        <img src="assets/imgs/back.jpg"/>
+                        <img src="assets/imgs/<?php echo $value['product_image']; ?>"/>
                         <div>
-                            <p>Details</p>
-                            <small><span>Bdt.</span>200.00</small>
+                            <p><?php echo $value['product_name']; ?></p>
+                            <small><span>Bdt.</span><?php echo $value['product_price']; ?></small>
                             <br>
                             <a class="remove-btn" href="#">Remove</a>
                         </div>
                     </div>
                 </td>
                 <td>
-                    <input type="number" value="1"/>
+                    <input type="number" value="<?php echo $value['product_quantity']; ?>"/>
                     <a class="edit-btn">Edit</a>
                 </td>
                 <td>
@@ -138,6 +141,7 @@ if(isset($_POST['add_to_cart'])){
                 </td>
                 
             </tr>
+            <?php } ?>
         </table>
         
         <div class="cart-total">

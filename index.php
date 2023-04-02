@@ -53,8 +53,8 @@
 
       <section id="home">
         <div class="container">
-          <h5>New Arrivals</h5>
-          <h1><span>Best Prices</span> This Season</h1>
+          <h5>New Way for Farmers</h5>
+          <h1><span>Best Products</span> For Farming</h1>
           <p>We offer the best price possible to help the people who provides for us.</p>
           <button>Shop Now</button>
         </div>
@@ -64,6 +64,7 @@
       <!--Brand-->
       <section id="brand" class="container">
         <div class="row">
+        <div class="container text-center"><h3>Few Brands We Work With</h3></div>
           <img class="img-fluid col-lg-3 col-md-6 col-sm-12" src="assets/imgs/brand1.png"/>
           <img class="img-fluid col-lg-3 col-md-6 col-sm-12" src="assets/imgs/brand2.png"/>
           <img class="img-fluid col-lg-3 col-md-6 col-sm-12" src="assets/imgs/brand3.png"/>
