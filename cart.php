@@ -40,11 +40,16 @@ if(isset($_POST['add_to_cart'])){
 
         $_SESSION['cart'][$product_id]=$product_array;
     }
+
+    calculateTotalCart();
     
 }else if(isset($_POST['remove_product'])){
 
     $product_id=$_POST['product_id'];
     unset($_SESSION['cart'][$product_id]);
+
+
+    calculateTotalCart();
 
 
 
@@ -57,6 +62,8 @@ if(isset($_POST['add_to_cart'])){
     $product_array['product_quantity']=$product_quantity;
     $_SESSION['cart'][$product_id]=$product_array;
 
+    calculateTotalCart();
+
 
 
 
@@ -66,6 +73,17 @@ if(isset($_POST['add_to_cart'])){
 
 
 
+function calculateTotalCart(){
+    $total=0;
+    foreach($_SESSION['cart'] as $key => $value){
+        $product=$_SESSION['cart'][$key];
+        $price=$product['product_price'];
+        $quantity=$product['product_quantity'];
+
+        $total=$total+($price*$quantity);
+    }
+    $_SESSION['total']=$total;
+}
 
 ?>
 
@@ -165,7 +183,7 @@ if(isset($_POST['add_to_cart'])){
                 </td>
                 <td>
                     <span>Bdt.</span>
-                    <span class="product-price">200.00</span>
+                    <span class="product-price"><?php echo $value['product_quantity'] * $value['product_price']; ?></span>
                 </td>
                 
             </tr>
@@ -175,19 +193,17 @@ if(isset($_POST['add_to_cart'])){
         <div class="cart-total">
             <table>
                 <tr>
-                    <td>Subtotal</td>
-                    <td>Bdt.200</td>
-                </tr>
-                <tr>
                     <td>Total</td>
-                    <td>Bdt.200</td>
+                    <td>Bdt. <?php echo $_SESSION['total']; ?></td>
                 </tr>
 
             </table>
         </div>
 
         <div class="checkout-container">
-            <button class="btn checkout-btn">Checkout</button>
+            <form method="POST" action="checkout.php">
+                <input type="submit" class="btn checkout-btn" value="Checkout" name="checkout" />
+            </form>
         </div>
 
 
