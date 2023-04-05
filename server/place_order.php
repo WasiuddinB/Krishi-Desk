@@ -42,6 +42,10 @@ if(isset($_POST['place_order'])){
         $stmt1->execute();
     }
 
+    // unset($_SESSION['cart']);
+
+    header('location: ../payment.php?order_status=Order placed successfully');
+
 
 
 }

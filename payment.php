@@ -1,3 +1,14 @@
+<?php
+
+session_start();
+
+?>
+
+
+
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -51,37 +62,16 @@
     </nav>
 
 
-      <!--Register-->
+      <!--Payment-->
       <section class="my-5 py-5">
         <div class="container text-center mt-3 pt-5">
-            <h2 class="form-weight-bold">Register</h2>
+            <h2 class="form-weight-bold">Payment</h2>
             <hr class="mx-auto">
         </div>
-        <div class="mx-auto container">
-            <form id="register-form">
-                <div class="form-group">
-                    <label>Name</label>
-                    <input type="text" class="form-control" id="register-name" name="name" placeholder="Name" required />
-                </div>
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="text" class="form-control" id="register-email" name="email" placeholder="Email" required />
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" class="form-control" id="register-password" name="password" placeholder="Password" required />
-                </div>
-                <div class="form-group">
-                    <label>Confirm Password</label>
-                    <input type="password" class="form-control" id="register-confirm-password" name="confirmPassword" placeholder="Confirm Password" required />
-                </div>
-                <div class="form-group">
-                    <input type="submit" class="btn" id="register-btn" value="Register"/>
-                </div>
-                <div class="form-group">
-                    <a id="login-url" class="btn">Do you have an account ? Login </a>
-                </div>
-            </form>
+        <div class="mx-auto container text-center">
+            <p><?php echo $_GET['order_status']; ?></p>
+            <p>Total Payment: Bdt.<?php echo $_SESSION['total']; ?></p>
+            <input class="btn btn-primary" type="submit" value="Proceed to Pay" />
         </div>
       </section>
 
