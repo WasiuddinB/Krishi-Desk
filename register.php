@@ -4,6 +4,11 @@ session_start();
 
 include('server/connection.php');
 
+if(isset($_SESSION['logged_in'])){
+  header('location: account.php');
+  exit;
+}
+
 if(isset($_POST['register'])){
   $name = $_POST['name'];
   $email = $_POST['email'];
@@ -47,9 +52,6 @@ if(isset($_POST['register'])){
       }
     }
   }
-}else if(isset($_SESSION['logged_in'])){
-  header('location: account.php');
-  exit;
 }
 
 ?>
@@ -89,19 +91,19 @@ if(isset($_POST['register'])){
               <a class="nav-link" href="index.php">Home</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="shop.html">Shop</a>
+              <a class="nav-link" href="shop.php">Shop</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="#">Blog</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="contact.html">Contact Us</a>
+              <a class="nav-link" href="contact.php">Contact Us</a>
             </li>
           </li>
 
           <li class="nav-item">
             <a href="cart.php"><i class="fas fa-shopping-bag"></i></a>
-            <a href="account.html"><i class="fas fa-user"></i></a>
+            <a href="account.php"><i class="fas fa-user"></i></a>
           </li>
             
           </ul>
