@@ -17,8 +17,9 @@ if(isset($_POST['login_btn'])){
 
   $stmt = $conn->prepare("SELECT user_id,user_name,user_email,user_password FROM users WHERE user_email=? AND user_password=? LIMIT 1");
   $stmt->bind_param('ss',$email,$password);
+
   if($stmt->execute()){
-    $stmt->bind_result($user_id,$user_name,$user_email.$user_password);
+    $stmt->bind_result($user_id,$user_name,$user_email,$user_password);
     $stmt->store_result();
 
     if($stmt->num_rows()==1){
@@ -32,18 +33,15 @@ if(isset($_POST['login_btn'])){
       header('location: account.php?message=Logged in successfully');
       
     }else{
-      header('location: account.php?message=Logged in successfully');
+      header('location: login.php?message=Could not verify your account!');
     }
   }
-  else{
-    header('location: login.php?error=Could not verify your account!');
-  }
-
-
+  
 
 }
-
-
+else{
+  header('location: login.php?error=Something went wrong!');
+}
 
 ?>
 
