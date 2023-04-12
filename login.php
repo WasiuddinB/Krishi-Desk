@@ -32,15 +32,15 @@ if(isset($_POST['login_btn'])){
 
       header('location: account.php?message=Logged in successfully');
       
-    }else{
+    }
+    
+    else{
       header('location: login.php?message=Could not verify your account!');
     }
+  }else{
+    header('location: login.php?error=Something went wrong!');
   }
-  
 
-}
-else{
-  header('location: login.php?error=Something went wrong!');
 }
 
 ?>
