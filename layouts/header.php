@@ -24,6 +24,14 @@
           <div class="collapse navbar-collapse nav-buttons" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
               
+            <span>
+              <div class="translate" id="google_translate_element"></div>
+              <script type="text/javascript" >
+                function googleTranslateElementInit(){ new google.translate.TranslateElement({pageLanguage: 'en'},'google_translate_element')};
+              </script>
+              <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+            </span>
+            
               <li class="nav-item">
                 <a class="nav-link" href="index.php">TUTORIALS</a>
               </li>
