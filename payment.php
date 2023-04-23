@@ -26,13 +26,17 @@ if(isset($_POST['order_pay_btn'])){
         <div class="mx-auto container text-center">
 
 
-        <?php if(isset($_SESSION['total']) && $_SESSION['total'] != 0) { ?>
+
+
+        <?php if(isset($_POST['order_status']) && $_POST['order_status'] == "not paid") { ?>
+          <p>Total Payment: Bdt.<?php echo $_POST['order_total_price']; ?></p>
+            <input class="btn btn-primary" type="submit" value="Proceed to Pay" />
+
+        <?php } else if(isset($_SESSION['total']) && $_SESSION['total'] != 0) { ?>
           <p>Total Payment: Bdt.<?php echo $_SESSION['total']; ?></p>
           <input class="btn btn-primary" type="submit" value="Proceed to Pay" />
   
-        <?php } else if(isset($_POST['order_status']) && $_POST['order_status'] == "not paid") { ?>
-          <p>Total Payment: Bdt.<?php echo $_POST['order_total_price']; ?></p>
-            <input class="btn btn-primary" type="submit" value="Proceed to Pay" />
+        
         <?php } else { ?>
           <p>You don't have any amount due to pay.</p>
         <?php }?>

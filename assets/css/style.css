@@ -2,7 +2,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200&display=swap');
 
 .nav-buttons{
-    margin-left: 21%;
+    margin-left: 10%;
 
 }
 
@@ -563,4 +563,13 @@ th:last-child{
 
 #contact span{
     color: mediumseagreen;
+}
+
+.cart-quantity{
+    background-color: mediumseagreen;
+    color: whitesmoke;
+    padding: 2px 5px;
+    border-radius: 50%;
+    margin: -4px;
+    font-size: 1rem;
 }
