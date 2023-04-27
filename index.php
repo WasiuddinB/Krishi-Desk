@@ -78,7 +78,7 @@
             </div>
             <h5 class="p-name"><?php echo $row['product_name']; ?></h5>
             <h4 class="p-price">Bdt. <?php echo $row['product_price'];?></h4>
-            <button class="buy-btn">Buy Now</button>
+            <a href="<?php echo "single_product.php?product_id=". $row['product_id']; ?>"><button class="buy-btn">Buy Now</button></a>
           </div>
 
           <?php } ?>
@@ -132,61 +132,28 @@
         <div class="container text-center mt-5 py-5">
           <h3>Machines</h3>
           <hr class="mx-auto">
-          <p>Here you can check the featured products.</p>
+          <p>Here you can check the Machine products.</p>
         </div>
+
+
         <div class="row mx-auto container-fluid">
-          <div class="product text-center col-lg-3 col-md-4 col-sm-12">
-            <img class="img-fluid mb-3" src="assets/imgs/back.jpg"/>
-            <div class="star">
-              <i class="fas fa-star"></i>
-              <i class="fas fa-star"></i>
-              <i class="fas fa-star"></i>
-              <i class="fas fa-star"></i>
-              <i class="fas fa-star"></i>
+
+          <?php include('server/get_machines.php'); ?>
+          <?php while($row=$machine_products->fetch_assoc()) { ?>
+            <div class="product text-center col-lg-3 col-md-4 col-sm-12">
+            <img class="img-fluid mb-3" src="assets/imgs/<?php echo $row['product_image']; ?>"/>
+              <div class="star">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+              </div>
+              <h5 class="p-name"><?php echo $row['product_name']; ?></h5>
+              <h4 class="p-price">Bdt. <?php echo $row['product_price'];?></h4>
+              <a href="<?php echo "single_product.php?product_id=". $row['product_id']; ?>"><button class="buy-btn">Buy Now</button></a>
             </div>
-            <h5 class="p-name">FARMING STUFF</h5>
-            <h4 class="p-price">Bdt.200.00</h4>
-            <button class="buy-btn">Buy Now</button>
-          </div>
-          <div class="product text-center col-lg-3 col-md-4 col-sm-12">
-            <img class="img-fluid mb-3" src="assets/imgs/back.jpg"/>
-            <div class="star">
-              <i class="fas fa-star"></i>
-              <i class="fas fa-star"></i>
-              <i class="fas fa-star"></i>
-              <i class="fas fa-star"></i>
-              <i class="fas fa-star"></i>
-            </div>
-            <h5 class="p-name">FARMING STUFF</h5>
-            <h4 class="p-price">Bdt.200.00</h4>
-            <button class="buy-btn">Buy Now</button>
-          </div>
-          <div class="product text-center col-lg-3 col-md-4 col-sm-12">
-            <img class="img-fluid mb-3" src="assets/imgs/back.jpg"/>
-            <div class="star">
-              <i class="fas fa-star"></i>
-              <i class="fas fa-star"></i>
-              <i class="fas fa-star"></i>
-              <i class="fas fa-star"></i>
-              <i class="fas fa-star"></i>
-            </div>
-            <h5 class="p-name">FARMING STUFF</h5>
-            <h4 class="p-price">Bdt.200.00</h4>
-            <button class="buy-btn">Buy Now</button>
-          </div>
-          <div class="product text-center col-lg-3 col-md-4 col-sm-12">
-            <img class="img-fluid mb-3" src="assets/imgs/back.jpg"/>
-            <div class="star">
-              <i class="fas fa-star"></i>
-              <i class="fas fa-star"></i>
-              <i class="fas fa-star"></i>
-              <i class="fas fa-star"></i>
-              <i class="fas fa-star"></i>
-            </div>
-            <h5 class="p-name">FARMING STUFF</h5>
-            <h4 class="p-price">Bdt.200.00</h4>
-            <button class="buy-btn">Buy Now</button>
-          </div>
+          <?php } ?>
         </div>
       </section>
 
@@ -197,59 +164,26 @@
           <hr class="mx-auto">
           <p>Here you can check the featured products.</p>
         </div>
+
         <div class="row mx-auto container-fluid">
-          <div class="product text-center col-lg-3 col-md-4 col-sm-12">
-            <img class="img-fluid mb-3" src="assets/imgs/back.jpg"/>
-            <div class="star">
-              <i class="fas fa-star"></i>
-              <i class="fas fa-star"></i>
-              <i class="fas fa-star"></i>
-              <i class="fas fa-star"></i>
-              <i class="fas fa-star"></i>
+
+          <?php include('server/get_pesticides.php'); ?>
+          <?php while($row=$pest_products->fetch_assoc()) { ?>
+            <div class="product text-center col-lg-3 col-md-4 col-sm-12">
+            <img class="img-fluid mb-3" src="assets/imgs/<?php echo $row['product_image']; ?>"/>
+              <div class="star">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+              </div>
+              <h5 class="p-name"><?php echo $row['product_name']; ?></h5>
+              <h4 class="p-price">Bdt. <?php echo $row['product_price'];?></h4>
+              <a href="<?php echo "single_product.php?product_id=". $row['product_id']; ?>"><button class="buy-btn">Buy Now</button></a>
             </div>
-            <h5 class="p-name">FARMING STUFF</h5>
-            <h4 class="p-price">Bdt.200.00</h4>
-            <button class="buy-btn">Buy Now</button>
-          </div>
-          <div class="product text-center col-lg-3 col-md-4 col-sm-12">
-            <img class="img-fluid mb-3" src="assets/imgs/back.jpg"/>
-            <div class="star">
-              <i class="fas fa-star"></i>
-              <i class="fas fa-star"></i>
-              <i class="fas fa-star"></i>
-              <i class="fas fa-star"></i>
-              <i class="fas fa-star"></i>
-            </div>
-            <h5 class="p-name">FARMING STUFF</h5>
-            <h4 class="p-price">Bdt.200.00</h4>
-            <button class="buy-btn">Buy Now</button>
-          </div>
-          <div class="product text-center col-lg-3 col-md-4 col-sm-12">
-            <img class="img-fluid mb-3" src="assets/imgs/back.jpg"/>
-            <div class="star">
-              <i class="fas fa-star"></i>
-              <i class="fas fa-star"></i>
-              <i class="fas fa-star"></i>
-              <i class="fas fa-star"></i>
-              <i class="fas fa-star"></i>
-            </div>
-            <h5 class="p-name">FARMING STUFF</h5>
-            <h4 class="p-price">Bdt.200.00</h4>
-            <button class="buy-btn">Buy Now</button>
-          </div>
-          <div class="product text-center col-lg-3 col-md-4 col-sm-12">
-            <img class="img-fluid mb-3" src="assets/imgs/back.jpg"/>
-            <div class="star">
-              <i class="fas fa-star"></i>
-              <i class="fas fa-star"></i>
-              <i class="fas fa-star"></i>
-              <i class="fas fa-star"></i>
-              <i class="fas fa-star"></i>
-            </div>
-            <h5 class="p-name">FARMING STUFF</h5>
-            <h4 class="p-price">Bdt.200.00</h4>
-            <button class="buy-btn">Buy Now</button>
-          </div>
+          <?php } ?>
+          
         </div>
       </section>
 

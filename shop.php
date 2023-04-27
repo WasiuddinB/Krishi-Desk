@@ -12,10 +12,31 @@ if(isset($_POST['search'])){
 
 
 }else{
-  $stmt=$conn->prepare("SELECT * FROM products");
-  $stmt->execute();
-  $products=$stmt->get_result();
+  if(isset($_GET['page_no']) && $_GET['page_no'] != ""){
+    $page_no = $_GET['page_no'];
+  }else{
+    $page_no = 1;
+  }
 
+
+  $stmt1 = $conn->prepare("SELECT COUNT(*) As total_records FROM products");
+  $stmt1->execute();
+  $stmt1->bind_result($total_records);
+  $stmt1->store_result();
+  $stmt1->fetch();
+
+  $total_records_per_page = 8;
+  $offset = ($page_no - 1) * $total_records_per_page;
+  $previous_page = $page_no - 1;
+  $next_page = $page_no + 1;
+
+  $adjacents = "2";
+
+  $total_no_of_pages = ceil($total_records/$total_records_per_page);
+
+  $stmt2 = $conn->prepare("SELECT * FROM products LIMIT $offset,$total_records_per_page");
+  $stmt2->execute();
+  $products = $stmt2->get_result();
 }
 
 ?>
@@ -45,21 +66,21 @@ if(isset($_POST['search'])){
               <div class="form-check">
                 <input class="form-check-input" value="Electronics" type="radio" name="category" id="category_two" checked/>
                 <label class="form-check-label" for="flexRadioDefault1">
-                  Mechanical
+                  Machines
                 </label>
               </div>
 
               <div class="form-check">
                 <input class="form-check-input" value="Pesticides" type="radio" name="category" id="category_three" checked/>
                 <label class="form-check-label" for="flexRadioDefault1">
-                  Random
+                  Pesticides
                 </label>
               </div>
 
               <div class="form-check">
                 <input class="form-check-input" value="Medicines" type="radio" name="category" id="category_four" checked/>
                 <label class="form-check-label" for="flexRadioDefault1">
-                  IDONTKNOW
+                  All
                 </label>
               </div>
 
@@ -113,11 +134,22 @@ if(isset($_POST['search'])){
 
           <nav aria-label="Page navigation example">
             <ul class="pagination mt-5">
-                <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-                <li class="page-item"><a class="page-link" href="#">1</a></li>
-                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                <li class="page-item <?php if($page_no<=1){echo 'disabled';} ?>">
+                  <a class="page-link" href="<?php if($page_no<=1){echo '#';} else{echo "?page_no=".($page_no-1);} ?>">Previous</a>
+                </li>
+
+                <li class="page-item"><a class="page-link" href="?page_no=1">1</a></li>
+                <li class="page-item"><a class="page-link" href="?page_no=2">2</a></li>
+
+                <?php if($page_no >= 3) { ?>
+                  <li class="page-item"><a class="page-link" href="#">...</a></li>
+                  <li class="page-item"><a class="page-link" href="<?php echo "?page_no=".$page_no ?>"><?php echo $page_no; ?></a></li>
+                <?php } ?>
+
+
+                <li class="page-item <?php if($page_no>=$total_no_of_pages){echo 'disabled';} ?>">
+                  <a class="page-link" href="<?php if($page_no>=$total_no_of_pages){echo '#';} else{echo "?page_no=".($page_no+1);} ?>">Next</a>
+                </li>
             </ul>
           </nav>
         </div>
