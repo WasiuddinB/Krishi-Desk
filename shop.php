@@ -2,13 +2,36 @@
 include('server/connection.php');
 
 if(isset($_POST['search'])){
+
+  if(isset($_GET['page_no']) && $_GET['page_no'] != ""){
+    $page_no = $_GET['page_no'];
+  }else{
+    $page_no = 1;
+  }
+
   $category=$_POST['category'];
   $price=$_POST['price'];
 
-  $stmt=$conn->prepare("SELECT * FROM products WHERE product_category=? AND product_price<=?");
-  $stmt->bind_param("si",$category,$price);
-  $stmt->execute();
-  $products=$stmt->get_result();
+  $stmt1 = $conn->prepare("SELECT COUNT(*) As total_records FROM products WHERE product_category=? AND product_price<=?");
+  $stmt1->bind_param('si',$category,$price);
+  $stmt1->execute();
+  $stmt1->bind_result($total_records);
+  $stmt1->store_result();
+  $stmt1->fetch();
+
+  $total_records_per_page = 8;
+  $offset = ($page_no - 1) * $total_records_per_page;
+  $previous_page = $page_no - 1;
+  $next_page = $page_no + 1;
+
+  $adjacents = "2";
+
+  $total_no_of_pages = ceil($total_records/$total_records_per_page);
+
+  $stmt2 = $conn->prepare("SELECT * FROM products WHERE product_category=? AND product_price<=? LIMIT $offset,$total_records_per_page");
+  $stmt2->bind_param('si',$category,$price);
+  $stmt2->execute();
+  $products = $stmt2->get_result();
 
 
 }else{
@@ -57,28 +80,28 @@ if(isset($_POST['search'])){
           <div class="col-lg-12 col-md-12 col-sm-12">
             <p>Category</p>
               <div class="form-check">
-                <input class="form-check-input" value="Vegetable" type="radio" name="category" id="category_one" />
+                <input class="form-check-input" value="Vegetable" type="radio" name="category" id="category_one" <?php if(isset($category) && $category=='vegetable'){echo 'checked';} ?> />
                 <label class="form-check-label" for="flexRadioDefault1">
                   Vegetables
                 </label>
               </div>
 
               <div class="form-check">
-                <input class="form-check-input" value="Electronics" type="radio" name="category" id="category_two" checked/>
+                <input class="form-check-input" value="Electronics" type="radio" name="category" id="category_two" <?php if(isset($category) && $category=='machine'){echo 'checked';} ?>/>
                 <label class="form-check-label" for="flexRadioDefault1">
                   Machines
                 </label>
               </div>
 
               <div class="form-check">
-                <input class="form-check-input" value="Pesticides" type="radio" name="category" id="category_three" checked/>
+                <input class="form-check-input" value="Pesticides" type="radio" name="category" id="category_three" <?php if(isset($category) && $category=='pesticide'){echo 'checked';} ?>/>
                 <label class="form-check-label" for="flexRadioDefault1">
                   Pesticides
                 </label>
               </div>
 
               <div class="form-check">
-                <input class="form-check-input" value="Medicines" type="radio" name="category" id="category_four" checked/>
+                <input class="form-check-input" value="Medicines" type="radio" name="category" id="category_four" <?php if(isset($category) && $category=='all'){echo 'checked';} ?>/>
                 <label class="form-check-label" for="flexRadioDefault1">
                   All
                 </label>
@@ -91,7 +114,7 @@ if(isset($_POST['search'])){
         <div class="row mx-auto container mt-5">
           <div class="col-lg-12 col-md-12 col-sm-12">
             <p>Price</p>
-            <input type="range" class="form-range w-50" name="price" value="100" min="1" max="1000" id="customRange2" />
+            <input type="range" class="form-range w-50" name="price" value="<?php if(isset($price)){echo $price;}else{echo "100";} ?>" min="1" max="1000" id="customRange2" />
             <div class="w-50">
               <span style="float: left;">1</span>
               <span style="float: right;">1000</span>
