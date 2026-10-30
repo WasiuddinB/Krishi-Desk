@@ -1,6 +1,6 @@
 <?php
 
-session_start();
+require_once __DIR__ . '/server/session.php';
 
 if(isset($_POST['order_pay_btn'])){
   $order_status = $_POST['order_status'];

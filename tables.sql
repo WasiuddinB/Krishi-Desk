@@ -62,3 +62,18 @@ CREATE TABLE IF NOT EXISTS `payments` (
   PRIMARY KEY (`payment_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+
+-- Added for deployment: orders insert these columns, so they must exist.
+ALTER TABLE `order_items`
+  ADD COLUMN `product_price` decimal(6,2) NOT NULL DEFAULT 0 AFTER `product_image`;
+
+ALTER TABLE `order_items`
+  ADD COLUMN `product_quantity` int(11) NOT NULL DEFAULT 1 AFTER `product_price`;
+
+-- Sessions table (also created automatically on Vercel).
+CREATE TABLE IF NOT EXISTS `sessions` (
+  `session_id` varchar(128) NOT NULL,
+  `session_data` mediumtext NOT NULL,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`session_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

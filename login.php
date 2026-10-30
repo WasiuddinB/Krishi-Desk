@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/server/session.php';
 
 
 include('server/connection.php');

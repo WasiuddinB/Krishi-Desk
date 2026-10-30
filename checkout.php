@@ -1,6 +1,6 @@
 <?php
 
-session_start();
+require_once __DIR__ . '/server/session.php';
 
 if(!empty($_SESSION['cart'])){
 
