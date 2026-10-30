@@ -13,7 +13,7 @@ $file = realpath($root . '/' . $path);
 
 // Only run .php files inside the project; layouts/ and the helper scripts
 // in server/ are includes, not pages.
-$allowed_server = ['server/place_order.php'];
+$allowed_server = ['server/place_order.php', 'server/confirm_payment.php'];
 $relative = $file ? str_replace('\\', '/', substr($file, strlen($root) + 1)) : '';
 
 $blocked = !$file

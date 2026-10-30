@@ -55,7 +55,10 @@ if(session_status() === PHP_SESSION_NONE){
         session_set_save_handler(new DbSessionHandler($conn), true);
     }
 
-    session_start();
+    // Never let a late call crash the page with a warning.
+    if(!headers_sent()){
+        session_start();
+    }
 }
 
 ?>

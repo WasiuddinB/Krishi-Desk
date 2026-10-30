@@ -1,43 +1,43 @@
-<!-- <!DOCTYPE html>
-<html>
-  <head>
-    <title>Tutorial</title>
-  </head>
-  <body> -->
+<?php
+require_once __DIR__ . '/server/init.php';
 
-  <?php include('layouts/header.php') ?>
+$page_title = 'Tutorials';
+$active = 'tutorials';
 
-    <section id="videos" class="container mt-5 py-5">
-      <div class="row">
-        <div class="container text-center mt-3 py-3"><h3>Here are some Tutorial videos</h3></div>
-        <hr class="mx-auto">
-      <!-- <h1>Tutorial Videos</h1> -->
-          <?php
-            echo '<video width="640" height="360" controls>';
-            echo '<source src="assets/videos/sample_1.mp4" type="video/mp4">';
-            echo '<source src="assets/videos/sample_2.mp4" type="video/mp4">';
-            echo 'Your browser does not support the video tag.';
-            echo '</video>';
-            echo '<br/>';
-          ?>
-          <?php
-            echo '<video width="640" height="360" controls>';
-            echo '<source src="assets/videos/sample_2.mp4" type="video/mp4">';
-            echo 'Your browser does not support the video tag.';
-            echo '</video>';
-            echo '<br/>';
-          ?>
-          <?php
-            echo '<video width="640" height="360" controls>';
-            echo '<source src="assets/videos/sample_3.mp4" type="video/mp4">';
-            echo 'Your browser does not support the video tag.';
-            echo '</video>';
-          ?>
-        </div>
-        <br/>
+$videos = [
+    ['Tutorial 1', 'assets/videos/sample_1.mp4', 'A short walkthrough of modern farming practice.'],
+    ['Tutorial 2', 'assets/videos/sample_2.mp4', 'Practical tips you can apply on your own land.'],
+    ['Tutorial 3', 'assets/videos/sample_3.mp4', 'Getting the most from your tools and crops.'],
+];
+?>
+<?php include('layouts/header.php'); ?>
+
+    <section class="page-hero">
+      <div class="container">
+        <h1>Farming Tutorials</h1>
+        <p>Watch and learn at your own pace.</p>
+      </div>
     </section>
 
+    <section id="videos" class="section">
+      <div class="container">
+        <div class="row g-4">
+          <?php foreach($videos as $video){ ?>
+          <div class="col-lg-4 col-md-6">
+            <div class="video-card">
+              <video controls preload="metadata">
+                <source src="<?php echo e($video[1]); ?>" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
+              <div class="video-body">
+                <h5><?php echo e($video[0]); ?></h5>
+                <p><?php echo e($video[2]); ?></p>
+              </div>
+            </div>
+          </div>
+          <?php } ?>
+        </div>
+      </div>
+    </section>
 
-<?php include('layouts/footer.php') ?>
-  <!-- </body>
-</html> -->
+<?php include('layouts/footer.php'); ?>

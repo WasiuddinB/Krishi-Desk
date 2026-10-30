@@ -1,188 +1,181 @@
 <?php
-include('server/connection.php');
+require_once __DIR__ . '/server/init.php';
+require_once __DIR__ . '/server/connection.php';
 
-if(isset($_POST['search'])){
+$page_title = 'Shop';
+$active = 'shop';
 
-  if(isset($_GET['page_no']) && $_GET['page_no'] != ""){
-    $page_no = $_GET['page_no'];
-  }else{
-    $page_no = 1;
-  }
+$categories = [
+    'all' => 'All products',
+    'vegetable' => 'Vegetables',
+    'machine' => 'Machines',
+    'pesticide' => 'Pesticides',
+    'fertilizer' => 'Fertilizers & Seeds',
+];
+$price_ranges = [
+    'any' => ['Any price', null, null],
+    'u500' => ['Under Bdt. 500', 0, 500],
+    'r500' => ['Bdt. 500 - 5,000', 500, 5000],
+    'r5000' => ['Bdt. 5,000 - 50,000', 5000, 50000],
+    'o50000' => ['Above Bdt. 50,000', 50000, null],
+];
+$sorts = [
+    'new' => ['Newest first', 'product_id DESC'],
+    'low' => ['Price: low to high', 'product_price ASC'],
+    'high' => ['Price: high to low', 'product_price DESC'],
+    'name' => ['Name: A to Z', 'product_name ASC'],
+];
 
-  $category=$_POST['category'];
-  $price=$_POST['price'];
+// Read the filters from the URL (so filtering and paging share one set of links).
+$category = isset($_GET['category']) && isset($categories[$_GET['category']]) ? $_GET['category'] : 'all';
+$price = isset($_GET['price']) && isset($price_ranges[$_GET['price']]) ? $_GET['price'] : 'any';
+$sort = isset($_GET['sort']) && isset($sorts[$_GET['sort']]) ? $_GET['sort'] : 'new';
+$q = isset($_GET['q']) ? trim($_GET['q']) : '';
+$page_no = isset($_GET['page_no']) ? max(1, (int)$_GET['page_no']) : 1;
 
-  $stmt1 = $conn->prepare("SELECT COUNT(*) As total_records FROM products WHERE product_category=? AND product_price<=?");
-  $stmt1->bind_param('si',$category,$price);
-  $stmt1->execute();
-  $stmt1->bind_result($total_records);
-  $stmt1->store_result();
-  $stmt1->fetch();
+$where = [];
+$types = '';
+$params = [];
 
-  $total_records_per_page = 8;
-  $offset = ($page_no - 1) * $total_records_per_page;
-  $previous_page = $page_no - 1;
-  $next_page = $page_no + 1;
-
-  $adjacents = "2";
-
-  $total_no_of_pages = ceil($total_records/$total_records_per_page);
-
-  $stmt2 = $conn->prepare("SELECT * FROM products WHERE product_category=? AND product_price<=? LIMIT $offset,$total_records_per_page");
-  $stmt2->bind_param('si',$category,$price);
-  $stmt2->execute();
-  $products = $stmt2->get_result();
-
-
-}else{
-  if(isset($_GET['page_no']) && $_GET['page_no'] != ""){
-    $page_no = $_GET['page_no'];
-  }else{
-    $page_no = 1;
-  }
-
-
-  $stmt1 = $conn->prepare("SELECT COUNT(*) As total_records FROM products");
-  $stmt1->execute();
-  $stmt1->bind_result($total_records);
-  $stmt1->store_result();
-  $stmt1->fetch();
-
-  $total_records_per_page = 8;
-  $offset = ($page_no - 1) * $total_records_per_page;
-  $previous_page = $page_no - 1;
-  $next_page = $page_no + 1;
-
-  $adjacents = "2";
-
-  $total_no_of_pages = ceil($total_records/$total_records_per_page);
-
-  $stmt2 = $conn->prepare("SELECT * FROM products LIMIT $offset,$total_records_per_page");
-  $stmt2->execute();
-  $products = $stmt2->get_result();
+if($category !== 'all'){
+    $where[] = 'product_category = ?';
+    $types .= 's';
+    $params[] = $category;
 }
+if($price_ranges[$price][1] !== null){
+    $where[] = 'product_price >= ?';
+    $types .= 'd';
+    $params[] = $price_ranges[$price][1];
+}
+if($price_ranges[$price][2] !== null){
+    $where[] = 'product_price < ?';
+    $types .= 'd';
+    $params[] = $price_ranges[$price][2];
+}
+if($q !== ''){
+    $where[] = '(product_name LIKE ? OR product_description LIKE ?)';
+    $types .= 'ss';
+    $like = '%' . $q . '%';
+    $params[] = $like;
+    $params[] = $like;
+}
+$where_sql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
 
+$stmt = $conn->prepare("SELECT COUNT(*) FROM products $where_sql");
+if($params){ $stmt->bind_param($types, ...$params); }
+$stmt->execute();
+$stmt->bind_result($total_records);
+$stmt->fetch();
+$stmt->close();
+
+$per_page = 8;
+$total_pages = max(1, (int)ceil($total_records / $per_page));
+if($page_no > $total_pages){ $page_no = $total_pages; }
+$offset = ($page_no - 1) * $per_page;
+
+$order_sql = $sorts[$sort][1];
+$stmt = $conn->prepare("SELECT * FROM products $where_sql ORDER BY $order_sql LIMIT $offset, $per_page");
+if($params){ $stmt->bind_param($types, ...$params); }
+$stmt->execute();
+$products = $stmt->get_result();
+
+// Build a link that keeps the current filters but changes the page.
+function shop_link($page){
+    $query = $_GET;
+    $query['page_no'] = $page;
+    return 'shop.php?' . http_build_query($query);
+}
 ?>
-
-
-
 <?php include('layouts/header.php'); ?>
 
-    <!--Search-->
-    <section id="search" class="my-5 py-5 ms-2">
-      <div class="container mt-5 py-5">      
-        <p>Search Products</p>
-        <hr>
+    <section class="page-hero">
+      <div class="container">
+        <h1>Our Shop</h1>
+        <p>Everything you need for the farm, in one place.</p>
       </div>
-      
-      <form action="shop.php" method="POST">
-        <div class="row mx-auto container">
-          <div class="col-lg-12 col-md-12 col-sm-12">
-            <p>Category</p>
-              <div class="form-check">
-                <input class="form-check-input" value="Vegetable" type="radio" name="category" id="category_one" <?php if(isset($category) && $category=='vegetable'){echo 'checked';} ?> />
-                <label class="form-check-label" for="flexRadioDefault1">
-                  Vegetables
-                </label>
-              </div>
-
-              <div class="form-check">
-                <input class="form-check-input" value="Electronics" type="radio" name="category" id="category_two" <?php if(isset($category) && $category=='machine'){echo 'checked';} ?>/>
-                <label class="form-check-label" for="flexRadioDefault1">
-                  Machines
-                </label>
-              </div>
-
-              <div class="form-check">
-                <input class="form-check-input" value="Pesticides" type="radio" name="category" id="category_three" <?php if(isset($category) && $category=='pesticide'){echo 'checked';} ?>/>
-                <label class="form-check-label" for="flexRadioDefault1">
-                  Pesticides
-                </label>
-              </div>
-
-              <div class="form-check">
-                <input class="form-check-input" value="Medicines" type="radio" name="category" id="category_four" <?php if(isset($category) && $category=='all'){echo 'checked';} ?>/>
-                <label class="form-check-label" for="flexRadioDefault1">
-                  All
-                </label>
-              </div>
-
-          </div>
-
-        </div>
-
-        <div class="row mx-auto container mt-5">
-          <div class="col-lg-12 col-md-12 col-sm-12">
-            <p>Price</p>
-            <input type="range" class="form-range w-50" name="price" value="<?php if(isset($price)){echo $price;}else{echo "100";} ?>" min="1" max="1000" id="customRange2" />
-            <div class="w-50">
-              <span style="float: left;">1</span>
-              <span style="float: right;">1000</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="form-group my-3 mx-3">
-          <input type="submit" name="search" value="Search" class="btn btn-primary" />
-        </div>
-      </form>
     </section>
 
-    <!--Shop-->
-      <section id="featured" class="my-5 py-5">
-        <div class="container mt-5 py-5">
-          <h3>Our Products</h3>
-          <hr>
-          <p>Here are the featured products.</p>
-        </div>
-        <div class="row mx-auto container">
+    <section class="section">
+      <div class="container">
+        <div class="row g-4">
 
-        <?php while($row=$products->fetch_assoc()){ ?>
-          <div onclick="window.location.href='single_product.php';" class="product text-center col-lg-3 col-md-4 col-sm-12">
-            <img class="img-fluid mb-3" src="assets/imgs/<?php echo $row['product_image']; ?>"/>
-            <div class="star">
-              <i class="fas fa-star"></i>
-              <i class="fas fa-star"></i>
-              <i class="fas fa-star"></i>
-              <i class="fas fa-star"></i>
-              <i class="fas fa-star"></i>
-            </div>
-            <h5 class="p-name"><?php echo $row['product_name']; ?></h5>
-            <h4 class="p-price">Bdt.<?php echo $row['product_price']; ?></h4>
-            <a class="btn shop-buy-btn" href="<?php echo "single_product.php?product_id=".$row['product_id']; ?>">Buy Now</a>
+          <!--Filters-->
+          <div class="col-lg-3">
+            <form class="filter-card" action="shop.php" method="GET">
+              <h5>Search &amp; Filter</h5>
+
+              <label class="form-label small">Keyword</label>
+              <input type="text" class="form-control mb-3" name="q" value="<?php echo e($q); ?>" placeholder="e.g. tomato, sprayer"/>
+
+              <label class="form-label small">Category</label>
+              <?php foreach($categories as $key => $label){ ?>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="category" value="<?php echo e($key); ?>" id="cat_<?php echo e($key); ?>" <?php if($category === $key){echo 'checked';} ?>/>
+                <label class="form-check-label" for="cat_<?php echo e($key); ?>"><?php echo e($label); ?></label>
+              </div>
+              <?php } ?>
+
+              <label class="form-label small mt-3" for="price">Price</label>
+              <select class="form-select mb-3" name="price" id="price">
+                <?php foreach($price_ranges as $key => $range){ ?>
+                <option value="<?php echo e($key); ?>" <?php if($price === $key){echo 'selected';} ?>><?php echo e($range[0]); ?></option>
+                <?php } ?>
+              </select>
+
+              <label class="form-label small" for="sort">Sort by</label>
+              <select class="form-select mb-4" name="sort" id="sort">
+                <?php foreach($sorts as $key => $s){ ?>
+                <option value="<?php echo e($key); ?>" <?php if($sort === $key){echo 'selected';} ?>><?php echo e($s[0]); ?></option>
+                <?php } ?>
+              </select>
+
+              <button type="submit" class="btn btn-green w-100">Apply</button>
+              <a href="shop.php" class="btn btn-link w-100 mt-1">Clear filters</a>
+            </form>
           </div>
 
-          <?php } ?>
-          
+          <!--Products-->
+          <div class="col-lg-9">
+            <p class="text-muted mb-3">
+              Showing <strong><?php echo $total_records; ?></strong> product<?php echo $total_records == 1 ? '' : 's'; ?>
+              <?php if($category !== 'all'){ ?> in <strong><?php echo e($categories[$category]); ?></strong><?php } ?>
+              <?php if($q !== ''){ ?> matching &ldquo;<?php echo e($q); ?>&rdquo;<?php } ?>
+            </p>
 
-          <nav aria-label="Page navigation example">
-            <ul class="pagination mt-5">
-                <li class="page-item <?php if($page_no<=1){echo 'disabled';} ?>">
-                  <a class="page-link" href="<?php if($page_no<=1){echo '#';} else{echo "?page_no=".($page_no-1);} ?>">Previous</a>
-                </li>
+            <?php if($total_records == 0){ ?>
+              <div class="empty-state">
+                <i class="fas fa-search"></i>
+                <h4>No products found</h4>
+                <p>Try a different keyword or clear the filters.</p>
+                <a href="shop.php" class="btn btn-green">See all products</a>
+              </div>
+            <?php } else { ?>
+              <div class="row g-4">
+                <?php while($row = $products->fetch_assoc()){ product_card($row, 'col-xl-4 col-md-6 col-12'); } ?>
+              </div>
 
-                <li class="page-item"><a class="page-link" href="?page_no=1">1</a></li>
-                <li class="page-item"><a class="page-link" href="?page_no=2">2</a></li>
+              <?php if($total_pages > 1){ ?>
+              <nav aria-label="Product pages">
+                <ul class="pagination justify-content-center mt-5">
+                  <li class="page-item <?php if($page_no <= 1){echo 'disabled';} ?>">
+                    <a class="page-link" href="<?php echo $page_no <= 1 ? '#' : e(shop_link($page_no - 1)); ?>">Previous</a>
+                  </li>
+                  <?php for($i = 1; $i <= $total_pages; $i++){ ?>
+                  <li class="page-item <?php if($i == $page_no){echo 'active';} ?>">
+                    <a class="page-link" href="<?php echo e(shop_link($i)); ?>"><?php echo $i; ?></a>
+                  </li>
+                  <?php } ?>
+                  <li class="page-item <?php if($page_no >= $total_pages){echo 'disabled';} ?>">
+                    <a class="page-link" href="<?php echo $page_no >= $total_pages ? '#' : e(shop_link($page_no + 1)); ?>">Next</a>
+                  </li>
+                </ul>
+              </nav>
+              <?php } ?>
+            <?php } ?>
+          </div>
 
-                <?php if($page_no >= 3) { ?>
-                  <li class="page-item"><a class="page-link" href="#">...</a></li>
-                  <li class="page-item"><a class="page-link" href="<?php echo "?page_no=".$page_no ?>"><?php echo $page_no; ?></a></li>
-                <?php } ?>
-
-
-                <li class="page-item <?php if($page_no>=$total_no_of_pages){echo 'disabled';} ?>">
-                  <a class="page-link" href="<?php if($page_no>=$total_no_of_pages){echo '#';} else{echo "?page_no=".($page_no+1);} ?>">Next</a>
-                </li>
-            </ul>
-          </nav>
         </div>
-      </section>
-
-
-
-
-
-
-
+      </div>
+    </section>
 
 <?php include('layouts/footer.php'); ?>

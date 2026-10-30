@@ -1,111 +1,87 @@
 <?php
-     
-if(array_key_exists('submit',$_GET)){
-    if(!$_GET['city']){
-        $error = "Sorry, your input field is empty";
-    }
-    if($_GET['city']){
-        $apiData=file_get_contents("https://api.openweathermap.org/data/2.5/weather?q=".$_GET['city']."&appid=f8f50bb31e786d71e1e5d0a8ba11f81e");
-        $weatherArray = json_decode($apiData,true);
+require_once __DIR__ . '/server/init.php';
 
-        if($weatherArray['cod'] == 200){
-            $tempCelsius = $weatherArray['main']['temp'] - 273;
-            $weather = "<b>".$weatherArray['name'].", ".$weatherArray['sys']['country']." : ".intval($tempCelsius)."&deg;C</b> <br>";
-            $weather .= "<b>Weather Condition : </b>" .$weatherArray['weather']['0']['description']."<br>";
-            $weather .= "<b>Atmospheric Pressure : </b>" .$weatherArray['main']['pressure']." hPa <br>";
-            $weather .= "<b>Wind Speed : </b>" .$weatherArray['wind']['speed']." meter/sec <br>";
-            $weather .= "<b>Cloudness : </b>" .$weatherArray['clouds']['all']."% <br>";
-            
-            date_default_timezone_set('Asia/Dhaka');
-            $sunrise = $weatherArray['sys']['sunrise'];
-            $weather.="<b>Sunrise : </b>".date("g:i a", $sunrise)."<br>";
-            $weather.="<b>Current Time : </b>".date("F j, Y, g:i a")."<br>";
-        }
-        else{
-            $error = "Could not be processed, Your city name is not valid";
+$page_title = 'Weather Forecast';
+$active = 'weather';
+
+// Set OPENWEATHER_API_KEY in the environment (Vercel project settings) to use your own key.
+$api_key = getenv('OPENWEATHER_API_KEY') ?: 'f8f50bb31e786d71e1e5d0a8ba11f81e';
+
+$city = isset($_GET['city']) ? trim($_GET['city']) : '';
+$weather = null;
+$error = '';
+
+if(isset($_GET['submit'])){
+    if($city === ''){
+        $error = 'Please enter a city name.';
+    }else{
+        $url = 'https://api.openweathermap.org/data/2.5/weather?q=' . urlencode($city) . '&units=metric&appid=' . urlencode($api_key);
+        $context = stream_context_create(['http' => ['timeout' => 8, 'ignore_errors' => true]]);
+        $body = @file_get_contents($url, false, $context);
+        $data = $body ? json_decode($body, true) : null;
+
+        if(!$data){
+            $error = 'The weather service is not reachable right now. Please try again later.';
+        }else if((int)$data['cod'] === 200){
+            $weather = $data;
+        }else if((int)$data['cod'] === 404){
+            $error = 'We could not find "' . $city . '". Check the spelling and try again.';
+        }else{
+            $error = 'The weather service could not complete the request. Please try again later.';
         }
     }
 }
 ?>
+<?php include('layouts/header.php'); ?>
 
+    <section class="page-hero">
+      <div class="container">
+        <h1>Weather Forecast</h1>
+        <p>Check the weather before you plan your day in the field.</p>
+      </div>
+    </section>
 
-
-
-<!doctype html>
-<html lang="en">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.rtl.min.css" integrity="sha384-T5m5WERuXcjgzF8DAb7tRkByEZQGcpraRTinjpywg37AO96WoYN9+hrhDVoM6CaT" crossorigin="anonymous">
-
-    <title>Weather Forecast</title>
-
-    <style>
-        body{
-            margin: 0px;
-            padding: 0px;
-            box-sizing: border-box;
-            background-color: whitesmoke;
-            color: black;
-            font-family: poppin,'Times New Roman',Times,serif;
-            font-size: large;
-            background-size: cover;
-            background-attachment: fixed;
-        }
-        .container{
-            text-align: center;
-            justify-content: center;
-            align-items: center;
-            width: 440px;
-        }
-        h1{
-            font-weight: 700;
-            margin-top: 150px;
-
-        }
-        .input{
-            width: 350px;
-            padding: 5px;
-        }
-    </style>
-
-
-  </head>
-  <body>
-    <div class="container">
-        <h1>What's the weather today?</h1>
-        <form action="" method="GET">
-            <p><label for="city">Enter your city name</label></p>
-            <p><input type="text" name="city" id="city" placeholder="City Name"></p>
-            <button type="submit" name="submit" class="btn btn-success">Submit Now</button>
-
-            <div class="output mt-3">
-                <?php 
-                    if($weather){
-                        echo '<div class="alert alert-success" role="alert">'.$weather.'</div>' ;
-                    }
-                    if($error){
-                        echo '<div class="alert alert-danger" role="alert">'.$error.'</div>' ;
-                    }
-                    
-                ?>
+    <section class="section">
+      <div class="container">
+        <div class="auth-wrap" style="max-width: 560px;">
+          <form class="form-card mb-4" method="GET" action="weather_forecast.php">
+            <label for="city">Enter your city name</label>
+            <div class="input-group">
+              <input type="text" class="form-control" name="city" id="city" value="<?php echo e($city); ?>" placeholder="e.g. Dhaka, Chattogram, Rajshahi" required>
+              <button type="submit" name="submit" class="btn btn-green">Check</button>
             </div>
-        </form>
-    </div>
-    
+          </form>
 
-    <!-- Optional JavaScript; choose one of the two! -->
+          <?php if($error){ ?>
+            <div class="alert alert-danger" role="alert"><?php echo e($error); ?></div>
+          <?php } ?>
 
-    <!-- Option 1: Bootstrap Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+          <?php if($weather){
+            $icon = $weather['weather'][0]['icon'];
+            date_default_timezone_set('Asia/Dhaka');
+          ?>
+            <div class="weather-card">
+              <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <div>
+                  <h3 class="mb-1"><?php echo e($weather['name']); ?>, <?php echo e($weather['sys']['country']); ?></h3>
+                  <p class="mb-0 text-capitalize"><?php echo e($weather['weather'][0]['description']); ?></p>
+                </div>
+                <img src="https://openweathermap.org/img/wn/<?php echo e($icon); ?>@2x.png" alt="" width="84" height="84"/>
+              </div>
+              <div class="weather-temp"><?php echo (int)round($weather['main']['temp']); ?>&deg;C</div>
+              <div class="weather-grid">
+                <div><small>Feels like</small><strong><?php echo (int)round($weather['main']['feels_like']); ?>&deg;C</strong></div>
+                <div><small>Humidity</small><strong><?php echo (int)$weather['main']['humidity']; ?>%</strong></div>
+                <div><small>Wind speed</small><strong><?php echo e($weather['wind']['speed']); ?> m/s</strong></div>
+                <div><small>Cloudiness</small><strong><?php echo (int)$weather['clouds']['all']; ?>%</strong></div>
+                <div><small>Pressure</small><strong><?php echo (int)$weather['main']['pressure']; ?> hPa</strong></div>
+                <div><small>Sunrise</small><strong><?php echo date('g:i a', $weather['sys']['sunrise']); ?></strong></div>
+              </div>
+              <p class="mt-3 mb-0 small opacity-75">Times shown in Bangladesh time.</p>
+            </div>
+          <?php } ?>
+        </div>
+      </div>
+    </section>
 
-    <!-- Option 2: Separate Popper and Bootstrap JS -->
-    <!--
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js" integrity="sha384-zYPOMqeu1DAVkHiLqWBUTcbYfZ8osu1Nd6Z89ify25QV9guujx43ITvfi12/QExE" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js" integrity="sha384-Y4oOpwW3duJdCWv5ly8SCFYWqFDsfob/3GkgExXKV4idmbt98QcxXYs9UoXAB7BZ" crossorigin="anonymous"></script>
-    -->
-  </body>
-</html>
+<?php include('layouts/footer.php'); ?>

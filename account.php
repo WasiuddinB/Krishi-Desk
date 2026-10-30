@@ -1,156 +1,132 @@
 <?php
-
-require_once __DIR__ . '/server/session.php';
-include('server/connection.php');
-
-if(!isset($_SESSION['logged_in'])){
-  header('location: login.php');
-  exit;
-}
-
+require_once __DIR__ . '/server/init.php';
+require_once __DIR__ . '/server/connection.php';
 
 if(isset($_GET['logout'])){
-  if(isset($_SESSION['logged_in'])){
-    unset($_SESSION['logged_in']);
-    unset($_SESSION['user_email']);
-    unset($_SESSION['user_name']);
-    header('location: login.php');
-    exit;
-  }
+    if(is_logged_in()){
+        unset($_SESSION['logged_in'], $_SESSION['user_id'], $_SESSION['user_email'], $_SESSION['user_name']);
+        session_regenerate_id(true);
+        flash('info', 'You have been logged out.');
+    }
+    redirect('login.php');
 }
 
+require_login('account.php');
+
+$user_id = (int)$_SESSION['user_id'];
 
 if(isset($_POST['change_password'])){
-  $password=$_POST['password'];
-  $confirmPassword=$_POST['confirmPassword'];
-  $user_email=$_SESSION['user_email'];
+    $password = $_POST['password'];
+    $confirmPassword = $_POST['confirmPassword'];
 
-  if($password!==$confirmPassword){
-    header('location: account.php?error=Passwords do not match');
-  }
-
-  else if(strlen($password) < 6){
-    header('location: account.php?error=Passwords must be at least 6 characters');
-  }else{
-    $stmt=$conn->prepare("UPDATE users SET user_password=? WHERE user_email=?");
-    $stmt->bind_param('ss',md5($password),$user_email);
-
-    if($stmt->execute()){
-      header('location:  account.php?message=Passwords has been updated successfully');
-
+    if($password !== $confirmPassword){
+        flash('danger', 'Passwords do not match.');
+    }else if(strlen($password) < 6){
+        flash('danger', 'Password must be at least 6 characters.');
     }else{
-      header('location:  account.php?error=Could not update password');
+        $hash = password_hash($password, PASSWORD_DEFAULT);
+        $stmt = $conn->prepare("UPDATE users SET user_password=? WHERE user_id=?");
+        $stmt->bind_param('si', $hash, $user_id);
+
+        if($stmt->execute()){
+            flash('success', 'Your password has been updated.');
+        }else{
+            flash('danger', 'Could not update your password.');
+        }
     }
-  }
+    redirect('account.php');
 }
 
+$stmt = $conn->prepare("SELECT * FROM orders WHERE user_id=? ORDER BY order_id DESC");
+$stmt->bind_param('i', $user_id);
+$stmt->execute();
+$orders = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
-if(isset($_SESSION['logged_in'])){
-  $user_id=$_SESSION['user_id'];
-  $stmt=$conn->prepare("SELECT * FROM orders WHERE user_id=?");
-  $stmt->bind_param('i',$user_id);
-  $stmt->execute();
-  $orders=$stmt->get_result();
-}
-
+$initial = mb_strtoupper(mb_substr($_SESSION['user_name'], 0, 1));
+$page_title = 'My Account';
+$active = 'account';
 ?>
-
-
 <?php include('layouts/header.php'); ?>
 
-      <!--Account-->
-      <section class="my-5 py-5">
-        <div class="row container mx-auto">
-            <div class="text-center mt-3 pt-5 col-lg-6 col-md-12 col-sm-12">
-            <p class="text-center" style="color: green"><?php if(isset($_GET['register'])){echo $_GET['register'];} ?></p>
-                <h3 class="font-weight-bold">Account info</h3>
-                <hr class="mx-auto">
-                <div class="account-info">
-                    <p>Name <span><?php if(isset($_SESSION['user_name'])) {echo $_SESSION['user_name'];}?></span></p>
-                    <p>Email <span><?php if(isset($_SESSION['user_email'])) {echo $_SESSION['user_email'];}?></span></p>
-                    <p><a href="#orders" id="order-btn">Your Orders</a></p>
-                    <p><a href="account.php?logout=1" id="logout-btn">Logout</a></p>
-                </div>
-            </div>
+    <section class="page-hero">
+      <div class="container">
+        <h1>My Account</h1>
+        <p>Manage your details and track your orders.</p>
+      </div>
+    </section>
 
-            <div class="col-lg-6 col-md-12 col-sm-12">
-                <form id="account-form" method="POST" action="account.php">
-                  <p class="text-center" style="color: red"><?php if(isset($_GET['error'])){echo $_GET['error'];} ?></p>
-                  <p class="text-center" style="color: green"><?php if(isset($_GET['message'])){echo $_GET['message'];} ?></p>
-                    <h3>Change Password</h3>
-                    <hr class="mx-auto">
-                    <div class="form-group">
-                        <label>Password</label>
-                        <input type="password" class="form-control" id="account-password" name="password" placeholder="Password" required/>
-                    </div>
-                    <div class="form-group">
-                        <label>Confirm Password</label>
-                        <input type="password" class="form-control" id="account-password-confirm" name="confirmPassword" placeholder="Confirm Password" required/>
-                    </div>
-                    <div class="form-group">
-                        <input type="submit" value="Change Password" name="change_password" class="btn" id="change-pass-btn"/>
-                    </div>
-                </form>
+    <section class="section">
+      <div class="container">
+        <div class="row g-4">
+          <div class="col-lg-5">
+            <div class="form-card account-box h-100">
+              <div class="avatar"><?php echo e($initial); ?></div>
+              <h3><?php echo e($_SESSION['user_name']); ?></h3>
+              <p class="sub"><?php echo e($_SESSION['user_email']); ?></p>
+              <a href="#orders" id="order-btn" class="btn btn-outline-green me-1">My Orders</a>
+              <a href="account.php?logout=1" id="logout-btn" class="btn btn-outline-danger">Logout</a>
             </div>
+          </div>
+
+          <div class="col-lg-7">
+            <form id="account-form" class="form-card h-100" method="POST" action="account.php">
+              <h3>Change password</h3>
+              <p class="sub">Choose a new password for your account.</p>
+              <div class="mb-3">
+                <label for="account-password">New password</label>
+                <input type="password" class="form-control" id="account-password" name="password" placeholder="At least 6 characters" minlength="6" required/>
+              </div>
+              <div class="mb-4">
+                <label for="account-password-confirm">Confirm new password</label>
+                <input type="password" class="form-control" id="account-password-confirm" name="confirmPassword" placeholder="Repeat the password" required/>
+              </div>
+              <button type="submit" name="change_password" class="btn btn-green" id="change-pass-btn">Change Password</button>
+            </form>
+          </div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!--Orders-->
-        <section id="orders" class="orders container my-5 py-3">
-            <div class="container mt-2">
-                <h2 class="font-weight-bold text-center">Your Orders</h2>
-                <hr class="mx-auto">
-            </div>
+    <!--Orders-->
+    <section id="orders" class="section section-alt orders">
+      <div class="container">
+        <div class="section-head">
+          <h2>My Orders</h2>
+        </div>
 
-            <table class="mt-5 pt-5">
-                <tr>
-                    <th>Order ID: </th>
-                    <th>Order Cost: </th>
-                    <th>Order Status: </th>
-                    <th>Order Date: </th>
-                    <th>Order Details: </th>
-                </tr>
-
-                <?php while($row=$orders->fetch_assoc()){ ?>
-
-                        <tr>
-                            <td>
-                                <!-- <div>
-                                    <img src="assets/imgs/back.jpg"/>
-                                    <div>
-                                        <p class="mt-3"><?php echo $row['order_id']; ?></p>
-                                    </div>
-                                </div> -->
-                                <span><?php echo $row['order_id']; ?></span>
-                            </td>
-                            <td>
-                              <span><?php echo $row['order_cost']; ?></span>
-                            </td>
-                            <td>
-                              <span><?php echo $row['order_status']; ?></span>
-                            </td>
-                            <td>
-                              <span><?php echo $row['order_date']; ?></span>
-                            </td>
-
-                            <td>
-                              <form method="POST" action="order_details.php">
-                                <input type="hidden" value="<?php echo $row['order_status']; ?>" name="order_status"  />
-                                <input type="hidden" value="<?php echo $row['order_id']; ?>" name="order_id" />
-                                <input class="btn order-details-btn" name="order_details_btn" type="submit" value="Details" />
-                              </form>
-                            </td>
-                            
-                        </tr>
-                    <?php } ?>
-
+        <?php if(empty($orders)){ ?>
+          <div class="empty-state">
+            <i class="fas fa-box-open"></i>
+            <h4>No orders yet</h4>
+            <p>When you place an order it will show up here.</p>
+            <a href="shop.php" class="btn btn-green">Go to the shop</a>
+          </div>
+        <?php } else { ?>
+          <div class="data-card table-scroll">
+            <table class="data-table">
+              <tr>
+                <th>Order</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th class="num">Total</th>
+                <th class="num">Actions</th>
+              </tr>
+              <?php foreach($orders as $row){ $unpaid = ($row['order_status'] === 'not paid'); ?>
+              <tr>
+                <td>#<?php echo (int)$row['order_id']; ?></td>
+                <td><?php echo e(date('j M Y', strtotime($row['order_date']))); ?></td>
+                <td><span class="status <?php echo $unpaid ? 'status-unpaid' : 'status-paid'; ?>"><?php echo e($row['order_status']); ?></span></td>
+                <td class="num"><?php echo money($row['order_cost']); ?></td>
+                <td class="num">
+                  <a class="btn btn-outline-green btn-sm" href="order_details.php?order_id=<?php echo (int)$row['order_id']; ?>">Details</a>
+                  <?php if($unpaid){ ?><a class="btn btn-green btn-sm" href="payment.php?order_id=<?php echo (int)$row['order_id']; ?>">Pay</a><?php } ?>
+                </td>
+              </tr>
+              <?php } ?>
             </table>
-            
-            
-
-
-        </section>
-
-
+          </div>
+        <?php } ?>
+      </div>
+    </section>
 
 <?php include('layouts/footer.php'); ?>

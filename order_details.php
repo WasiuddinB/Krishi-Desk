@@ -1,97 +1,87 @@
 <?php
+require_once __DIR__ . '/server/init.php';
+require_once __DIR__ . '/server/connection.php';
 
-include('server/connection.php');
+require_login('account.php');
 
-if(isset($_POST['order_details_btn']) && isset($_POST['order_id'])){
+$order_id = isset($_GET['order_id']) ? (int)$_GET['order_id'] : 0;
+$user_id = (int)$_SESSION['user_id'];
 
-    $order_id=$_POST['order_id'];
-    $order_status=$_POST['order_status'];
-    $stmt=$conn->prepare("SELECT * FROM order_items WHERE order_id=?");
-    $stmt->bind_param('i',$order_id);
-    $stmt->execute();
-    $order_details=$stmt->get_result();
-    $order_total_price = calculateTotalOrderPrice($order_details);
+// Only the owner can see an order.
+$stmt = $conn->prepare("SELECT * FROM orders WHERE order_id=? AND user_id=?");
+$stmt->bind_param('ii', $order_id, $user_id);
+$stmt->execute();
+$order = $stmt->get_result()->fetch_assoc();
 
-}
-else{
-    header('location: account.php');
-}
-
-
-function calculateTotalOrderPrice($order_details){
-    $total=0;
-
-    foreach($order_details as $row){
-        $product_price=$row['product_price'];
-        $product_quantity=$row['product_quantity'];
-
-        $total=$total+($product_price*$product_quantity);
-    }
-    return $total;
+if(!$order){
+    flash('danger', 'We could not find that order.');
+    redirect('account.php#orders');
 }
 
+$stmt = $conn->prepare("SELECT * FROM order_items WHERE order_id=?");
+$stmt->bind_param('i', $order_id);
+$stmt->execute();
+$items = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
+$page_title = 'Order #' . $order_id;
+$active = 'account';
+$is_unpaid = ($order['order_status'] === 'not paid');
 ?>
-
-
-
-
 <?php include('layouts/header.php'); ?>
 
-    <!--Order Details-->
-    <section id="orders" class="orders container my-5 py-3">
-            <div class="container mt-5">
-                <h2 class="font-weight-bold text-center">Order Details</h2>
-                <hr class="mx-auto">
-            </div>
+    <section class="page-hero">
+      <div class="container">
+        <h1>Order #<?php echo (int)$order['order_id']; ?></h1>
+        <p>Placed on <?php echo e(date('j M Y, g:i a', strtotime($order['order_date']))); ?></p>
+      </div>
+    </section>
 
-            <table class="mt-5 pt-5 mx-auto">
+    <section class="section orders">
+      <div class="container">
+        <div class="row g-4">
+          <div class="col-lg-8">
+            <div class="data-card table-scroll">
+              <table class="data-table">
                 <tr>
-                    <th>Product: </th>
-                    <th>Product Price: </th>
-                    <th>Product Quantity: </th>
+                  <th>Product</th>
+                  <th class="num">Price</th>
+                  <th class="num">Quantity</th>
+                  <th class="num">Subtotal</th>
                 </tr>
-
-                <?php foreach($order_details as $row){ ?>
-
-                        <tr>
-                            <td>
-                                <div>
-                                    <img src="assets/imgs/<?php echo $row['product_image'];  ?>"/>
-                                    <div>
-                                        <p class="mt-3"><?php echo $row['product_name'];?></p>
-                                    </div>
-                                </div>
-                                
-                            </td>
-                            <td>
-                              <span>Bdt.<?php echo $row['product_price'];?></span>
-                            </td>
-                            <td>
-                              <span><?php echo $row['product_quantity'];?></span>
-                            </td>
-                            
-
-                            
-                            
-                        </tr>
-                    <?php } ?>
-
-            </table>
-
-                <?php if($order_status == "not paid") { ?>
-                    <form style="float: right" method="POST" action="payment.php">
-                        <input type="hidden" name="order_total_price" value="<?php echo $order_total_price; ?>" />
-                        <input type="hidden" name="order_status" value="<?php echo $order_status; ?>" />
-                        <input type="submit" name="order_pay_btn" class="btn btn-primary" value="Pay Now"/>
-                    </form>
-            
+                <?php foreach($items as $row){ ?>
+                <tr>
+                  <td>
+                    <div class="cart-product">
+                      <img src="assets/imgs/<?php echo e($row['product_image']); ?>" alt=""/>
+                      <p><?php echo e($row['product_name']); ?></p>
+                    </div>
+                  </td>
+                  <td class="num"><?php echo money($row['product_price']); ?></td>
+                  <td class="num"><?php echo (int)$row['product_quantity']; ?></td>
+                  <td class="num"><?php echo money($row['product_price'] * $row['product_quantity']); ?></td>
+                </tr>
                 <?php } ?>
-            
+              </table>
+            </div>
+          </div>
 
-
-        </section>
-
-
+          <div class="col-lg-4">
+            <div class="summary-card">
+              <h5 class="mb-3">Summary</h5>
+              <div class="row-line"><span>Status</span>
+                <span class="status <?php echo $is_unpaid ? 'status-unpaid' : 'status-paid'; ?>"><?php echo e($order['order_status']); ?></span>
+              </div>
+              <div class="row-line"><span>Deliver to</span><span class="text-end"><?php echo e($order['user_address']); ?>, <?php echo e($order['user_city']); ?></span></div>
+              <div class="row-line"><span>Phone</span><span><?php echo e($order['user_phone']); ?></span></div>
+              <div class="row-line total"><span>Total</span><span><?php echo money($order['order_cost']); ?></span></div>
+              <?php if($is_unpaid){ ?>
+                <a href="payment.php?order_id=<?php echo (int)$order['order_id']; ?>" class="btn btn-green btn-lg w-100 mt-3">Pay Now</a>
+              <?php } ?>
+              <a href="account.php#orders" class="btn btn-link w-100 mt-1">Back to my orders</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
 <?php include('layouts/footer.php'); ?>

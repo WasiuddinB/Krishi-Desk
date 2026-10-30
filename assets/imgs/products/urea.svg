@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="400" height="300">
+<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fdf6e7"/><stop offset="1" stop-color="#f3e4c2"/></linearGradient></defs>
+<rect width="400" height="300" fill="url(#g)"/>
+<ellipse cx="200" cy="262" rx="130" ry="12" fill="#000" opacity="0.08"/>
+
+<path d="M110 70 Q200 40 290 70 L304 250 Q304 262 292 262 H108 Q96 262 96 250 Z" fill="#e9d3a5"/>
+<path d="M110 70 Q200 90 290 70" fill="none" stroke="#c9ae78" stroke-width="5"/>
+<rect x="124" y="120" width="152" height="110" rx="10" fill="#2e9444"/>
+<text x="200" y="165" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="24" fill="#fff">UREA</text>
+<text x="200" y="192" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#fff" opacity="0.9">50 kg bag</text>
+<path d="M200 205 q16 4 16 18 q-16 -3 -16 -18z" fill="#fff" opacity="0.85"/>
+</svg>
