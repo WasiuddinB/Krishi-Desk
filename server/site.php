@@ -6,7 +6,7 @@
 
 define('SITE_NAME', 'KrishiDesk');
 define('SITE_TAGLINE', 'Seeds, tools and farming know-how for Bangladesh.');
-define('SITE_OWNER', 'Wasi Uddin Bhuiyan');
+define('SITE_OWNER', 'Wasi Uddin Bhuyian');
 define('SITE_ADDRESS', 'Dhaka, Bangladesh');
 define('SITE_PHONE', '');
 define('SITE_EMAIL', '');
