@@ -8,8 +8,8 @@ $cart_quantity = !empty($_SESSION['quantity']) ? (int)$_SESSION['quantity'] : 0;
 $nav = [
     'home' => ['index.php', 'Home'],
     'shop' => ['shop.php', 'Shop'],
-    'tutorials' => ['tutorial.php', 'Tutorials'],
-    'blog' => ['blog.php', 'Blog'],
+    'tutorials' => ['tutorial.php', 'Videos'],
+    'blog' => ['blog.php', 'Guides'],
     'contact' => ['contact.php', 'Contact'],
 ];
 ?>

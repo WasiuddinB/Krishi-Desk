@@ -7,9 +7,11 @@ function e($value){
     return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');
 }
 
-// Format a number as Bangladeshi Taka.
+// Format a number as Bangladeshi Taka, e.g. ৳650 or ৳54.50.
 function money($amount){
-    return 'Bdt. ' . number_format((float)$amount, 2);
+    $amount = round((float)$amount, 2);
+    $decimals = (floor($amount) == $amount) ? 0 : 2;
+    return '৳' . number_format($amount, $decimals);
 }
 
 // Queue a one-time message that is shown as a toast on the next page.

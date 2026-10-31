@@ -322,21 +322,6 @@ iframe.goog-te-banner-frame{
     max-width: 480px;
     margin: 1rem 0 1.8rem;
 }
-#home .hero-stats{
-    display: flex;
-    gap: 2rem;
-    margin-top: 2.2rem;
-    flex-wrap: wrap;
-}
-#home .hero-stats strong{
-    display: block;
-    font-size: 1.5rem;
-    color: var(--green-900);
-}
-#home .hero-stats span{
-    color: var(--muted);
-    font-size: 0.85rem;
-}
 .hero-img{
     position: relative;
 }
@@ -344,8 +329,8 @@ iframe.goog-te-banner-frame{
     border-radius: 28px;
     box-shadow: var(--shadow-lg);
     width: 100%;
-    max-width: 460px;
-    aspect-ratio: 1 / 1;
+    max-width: 560px;
+    aspect-ratio: 4 / 3;
     object-fit: cover;
 }
 .hero-img::before{
@@ -391,29 +376,6 @@ iframe.goog-te-banner-frame{
     color: var(--muted);
     font-size: 0.9rem;
     margin: 0;
-}
-
-/* ---------- Home: brands ---------- */
-
-.brand-row{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 2.5rem 4rem;
-}
-.brand-row img{
-    height: 70px;
-    width: auto;
-    max-width: 180px;
-    object-fit: contain;
-    filter: grayscale(100%);
-    opacity: 0.7;
-    transition: all 0.3s ease;
-}
-.brand-row img:hover{
-    filter: none;
-    opacity: 1;
 }
 
 /* ---------- Home: promo cards ---------- */
@@ -1085,5 +1047,77 @@ iframe.goog-te-banner-frame{
 }
 .btn-link:hover{
     color: var(--green-900);
+    text-decoration: underline;
+}
+
+/* Guides */
+.post-tips{
+    padding-left: 1.1rem;
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+.post-tips li{
+    margin-bottom: 0.35rem;
+}
+
+/* Forecast */
+.forecast-grid{
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+}
+.forecast-day{
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 0.9rem 0.5rem;
+    text-align: center;
+}
+.forecast-day strong{
+    display: block;
+    color: var(--green-900);
+}
+.forecast-day img{
+    width: 56px;
+    height: 56px;
+}
+.forecast-day small{
+    display: block;
+    color: var(--muted);
+}
+.farm-notes{
+    background: var(--green-50);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--green-500);
+    border-radius: var(--radius);
+    padding: 1.2rem 1.4rem;
+}
+.farm-notes ul{
+    margin: 0.5rem 0 0.6rem;
+    padding-left: 1.1rem;
+}
+.district-links a{
+    display: inline-block;
+    padding: 4px 14px;
+    margin: 3px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    font-size: 0.85rem;
+    background: #fff;
+}
+.district-links a:hover, .district-links a.active{
+    background: var(--green-600);
+    border-color: var(--green-600);
+    color: #fff;
+}
+@media (max-width: 767.98px){
+    .forecast-grid{
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.site-footer p a{
+    color: #fff;
     text-decoration: underline;
 }

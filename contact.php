@@ -44,7 +44,7 @@ $active = 'contact';
     <section class="page-hero">
       <div class="container">
         <h1>Contact Us</h1>
-        <p>Questions about an order or a product? We would love to help.</p>
+        <p>Questions about a product or an order? Send us a message.</p>
       </div>
     </section>
 
@@ -61,20 +61,24 @@ $active = 'contact';
               <div class="icon"><i class="fas fa-map-marker-alt"></i></div>
               <div><h6>Address</h6><p><?php echo e(SITE_ADDRESS); ?></p></div>
             </div>
+            <?php if(SITE_PHONE !== ''){ ?>
             <div class="contact-info">
               <div class="icon"><i class="fas fa-phone"></i></div>
               <div><h6>Phone</h6><p><?php echo e(SITE_PHONE); ?></p></div>
             </div>
+            <?php } ?>
+            <?php if(SITE_EMAIL !== ''){ ?>
             <div class="contact-info">
               <div class="icon"><i class="fas fa-envelope"></i></div>
               <div><h6>Email</h6><p><?php echo e(SITE_EMAIL); ?></p></div>
             </div>
+            <?php } ?>
           </div>
 
           <div class="col-lg-7">
             <form class="form-card" method="POST" action="contact.php">
               <h3>Send us a message</h3>
-              <p class="sub">We usually reply within a day.</p>
+              <p class="sub">Ask about a product or an order and we will get back to you.</p>
               <div class="row g-3">
                 <div class="col-md-6">
                   <label for="contact-name">Your name</label>

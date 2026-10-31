@@ -77,10 +77,18 @@ $active = 'shop';
               <a href="shop.php" class="btn btn-outline-green btn-lg">Keep Shopping</a>
             </form>
 
-            <ul class="list-unstyled text-muted small">
-              <li><i class="fas fa-check text-success me-2"></i>Delivered to your door</li>
-              <li><i class="fas fa-check text-success me-2"></i>Secure checkout</li>
-            </ul>
+            <?php
+              $notes = [
+                  'pesticide' => 'Read the product label and follow the manufacturer\'s instructions. Wear protective clothing when handling or spraying.',
+                  'fertilizer' => 'Follow the application rate printed on the pack or recommended by your local agriculture office.',
+                  'machine' => 'Read the operating manual before use, and keep guards and covers in place while the machine is running.',
+              ];
+              if(isset($notes[$product['product_category']])){
+            ?>
+            <div class="alert alert-light border small mb-0">
+              <i class="fas fa-info-circle text-success me-1"></i> <?php echo e($notes[$product['product_category']]); ?>
+            </div>
+            <?php } ?>
           </div>
         </div>
       </div>

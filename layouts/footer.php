@@ -22,8 +22,8 @@
             <div class="footer-one col-lg-2 col-md-6 col-6">
                 <h5 class="pb-2">Explore</h5>
                 <ul>
-                    <li><a href="tutorial.php">Tutorials</a></li>
-                    <li><a href="blog.php">Blog</a></li>
+                    <li><a href="tutorial.php">Farm videos</a></li>
+                    <li><a href="blog.php">Farming guides</a></li>
                     <li><a href="weather_forecast.php">Weather</a></li>
                     <li><a href="contact.php">Contact</a></li>
                 </ul>
@@ -31,22 +31,18 @@
             <div class="footer-one col-lg-4 col-md-6 col-12">
                 <h5 class="pb-2">Contact Us</h5>
                 <p class="mb-1"><i class="fas fa-map-marker-alt"></i> <?php echo e(SITE_ADDRESS); ?></p>
-                <p class="mb-1"><i class="fas fa-phone"></i> <?php echo e(SITE_PHONE); ?></p>
-                <p class="mb-1"><i class="fas fa-envelope"></i> <?php echo e(SITE_EMAIL); ?></p>
+                <?php if(SITE_PHONE !== ''){ ?><p class="mb-1"><i class="fas fa-phone"></i> <?php echo e(SITE_PHONE); ?></p><?php } ?>
+                <?php if(SITE_EMAIL !== ''){ ?><p class="mb-1"><i class="fas fa-envelope"></i> <?php echo e(SITE_EMAIL); ?></p><?php } ?>
+                <p class="mb-1"><i class="fas fa-comment-dots"></i> <a href="contact.php">Send us a message</a></p>
             </div>
         </div>
         <div class="copyright mt-5">
             <div class="row container mx-auto align-items-center g-3">
-                <div class="col-lg-4 col-md-12">
-                    <img class="pay-img" src="assets/imgs/payment.jpg" alt="Accepted payment methods"/>
+                <div class="col-md-6">
+                    <p class="mb-0">Pay with bKash, Nagad, card or cash on delivery</p>
                 </div>
-                <div class="col-lg-4 col-md-6 text-lg-center">
+                <div class="col-md-6 text-md-end">
                     <p class="mb-0">&copy; <?php echo date('Y'); ?> <?php echo e(SITE_NAME); ?> &middot; Built by <?php echo e(SITE_OWNER); ?></p>
-                </div>
-                <div class="col-lg-4 col-md-6 text-md-end">
-                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
                 </div>
             </div>
         </div>

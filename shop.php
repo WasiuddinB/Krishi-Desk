@@ -91,7 +91,7 @@ function shop_link($page){
     <section class="page-hero">
       <div class="container">
         <h1>Our Shop</h1>
-        <p>Everything you need for the farm, in one place.</p>
+        <p>Vegetables, farm machines, crop care and fertilizers.</p>
       </div>
     </section>
 
